@@ -1,6 +1,5 @@
 # Framework to use to have a window for showing the figure
 import pygame
-import matrix as mat
 import math
 
 # WINDOWS SIZE PARAMETERS
@@ -18,6 +17,23 @@ BLUE = (0,0,255)
 BLACK = (0,0,0)
 
 SCREEN_CENTER = (WIDTH/2,HEIGHT/2)
+
+# Matrix Operation Functions
+def matMult(mat1, mat2):
+    mat3 = []
+    if (len(mat1[0]) == len(mat2)):
+        for i in range(len(mat1)):
+            temp = []
+            total = 0
+            for j in range(len(mat1[0])):
+                total += mat2[j] * mat1[i][j]
+
+            temp.append(total)
+            mat3.append(temp)
+    else:
+        print("Invalid Matrix size")
+        return None
+    return mat3
 
 # Figure vertices
 cube = [
@@ -81,33 +97,18 @@ while running:
 
 
     angle += 0.01
-    projectedPoints = []
     for i in range(8):
-            rotatedPoint = mat.rotateMult(rotateX,cube[i])
-            rotatedPoint = mat.matMult(rotateY,rotatedPoint)
-            rotatedPoint = mat.matMult(rotateZ,rotatedPoint)
-            projectedPoint = mat.matMult(projectionMat,rotatedPoint)
-            # projectedPoint = mat.rotateMult(projectionMat,cube[i])
-            x = projectedPoint[0][0]*SCALE + SCREEN_CENTER[0]
-            y = projectedPoint[1][0]*SCALE + SCREEN_CENTER[1]
-            pygame.draw.circle(screen, GREEN, (x,y), 5)
-            pygame.draw.circle(screen, GREEN, (x,y), 5)
-            projectedPoints.append((x,y))
+            projectedPoint = matMult(projectionMat,cube[i])
+            if i<4:
+                x = projectedPoint[0][0]*SCALE + SCREEN_CENTER[0]
+                y = projectedPoint[1][0]*SCALE + SCREEN_CENTER[1]
+            else:
+                x = projectedPoint[0][0]*SCALE + SCREEN_CENTER[0] - SCALE/2
+                y = projectedPoint[1][0]*SCALE + SCREEN_CENTER[1] - SCALE/2              
+            pygame.draw.circle(screen, RED, (x,y), 5)
+            pygame.draw.circle(screen, RED, (x,y), 5)
 
     # Render the cube edges
-    pygame.draw.line(screen, BLACK, projectedPoints[0], projectedPoints[1])
-    pygame.draw.line(screen, BLACK, projectedPoints[1], projectedPoints[2])
-    pygame.draw.line(screen, BLACK, projectedPoints[2], projectedPoints[3])
-    pygame.draw.line(screen, BLACK, projectedPoints[3], projectedPoints[0])
-    pygame.draw.line(screen, BLACK, projectedPoints[0], projectedPoints[5])
-    pygame.draw.line(screen, BLACK, projectedPoints[4], projectedPoints[5])
-    pygame.draw.line(screen, BLACK, projectedPoints[5], projectedPoints[6])
-    pygame.draw.line(screen, BLACK, projectedPoints[6], projectedPoints[7])
-    pygame.draw.line(screen, BLACK, projectedPoints[7], projectedPoints[4])
-    pygame.draw.line(screen, BLACK, projectedPoints[4], projectedPoints[1])
-    pygame.draw.line(screen, BLACK, projectedPoints[3], projectedPoints[6])
-    pygame.draw.line(screen, BLACK, projectedPoints[2], projectedPoints[7])
-
 
     # Show changes
     pygame.display.flip()
